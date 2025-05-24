@@ -1,0 +1,105 @@
+Visual Studio cache files
+*.vs/
+*.VC.db
+*.suo
+*.user
+*.sln.docstates
+
+Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
+Roslyn files
+.roslyn/
+
+Rider files
+.idea/
+*.sln.iml
+
+User-specific files
+*.DotSettings.user
+
+Build server files
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.[Pp]ublish.xml
+*.azurePubxml
+
+Note: Some CI build results folder names are set dynamically based on the build pipeline configuration.
+Visual Studio Team Services / Azure DevOps
+.alpackages/*.app
+.alpackages
+
+Visual Studio Code files
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+macOS files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+Windows files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+NuGet Packaging files
+*.nupkg
+*.snupkg
+
+NuGet symbol server build files
+*.symbols.nupkg
+
+node.js / npm
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+Client-side build output
+wwwroot/dist/
+ClientApp/dist/
+
+IDE ReSharper files
+_ReSharper*/
+*.[Rr]e[Ss]harper
+
+Cache and temp files
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
+Minification
+*.min.css
+*.min.js
+
+Environment files
+.env
+.env.*
+!.env.example
+
+Test files
+*.snap
+coverage/
+*.lcov
+
+WebStorm specific files
+.idea/webServers.xml
+.idea/runConfigurations.xml

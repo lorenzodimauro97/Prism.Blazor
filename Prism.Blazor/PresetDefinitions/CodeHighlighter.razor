@@ -1,0 +1,141 @@
+﻿@using System.Text
+@using System.Text.RegularExpressions
+@using System.Web
+
+@if (_isProcessing)
+{
+    <div class="code-highlighter-loading">@LoadingMessage</div>
+}
+else
+{
+    <pre class="code-highlighter-pre"><code
+            class="code-highlighter-code language-@(LanguageDefinition?.Name.ToLowerInvariant() ?? "unknown")">@_highlightedContent</code></pre>
+}
+
+@code {
+    private MarkupString _highlightedContent;
+    private bool _isProcessing = true;
+    private string? _previousContent;
+    private ILanguageDefinition? _previousLanguageDefinition;
+
+    [Parameter] public string? Content { get; set; }
+
+    [Parameter] public ILanguageDefinition? LanguageDefinition { get; set; }
+
+    [Parameter] public string LoadingMessage { get; set; } = "Processing code...";
+
+    [Parameter] public string ErrorMessage { get; set; } = "Error highlighting code.";
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Content != _previousContent || LanguageDefinition != _previousLanguageDefinition)
+        {
+            _previousContent = Content;
+            _previousLanguageDefinition = LanguageDefinition;
+            await HighlightAsync();
+        }
+    }
+
+    private async Task HighlightAsync()
+    {
+        if (string.IsNullOrEmpty(Content) || LanguageDefinition == null)
+        {
+            _highlightedContent = new MarkupString(HttpUtility.HtmlEncode(Content ?? string.Empty));
+            _isProcessing = false;
+            StateHasChanged();
+            return;
+        }
+
+        _isProcessing = true;
+        await InvokeAsync(StateHasChanged);
+
+        try
+        {
+            var html = await Task.Run(() => ProcessHighlighting(Content, LanguageDefinition.GetRules()));
+            _highlightedContent = new MarkupString(html);
+        }
+        catch (Exception ex)
+        {
+            await Console.Error.WriteLineAsync($"Error highlighting code: {ex.Message}");
+            _highlightedContent = new MarkupString($"<span style=\"color: red; font-weight: bold;\">{HttpUtility.HtmlEncode(ErrorMessage)}</span><br/>{HttpUtility.HtmlEncode(Content)}");
+        }
+        finally
+        {
+            _isProcessing = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private static string ProcessHighlighting(string? text, IEnumerable<TokenRule> rules)
+    {
+        if (string.IsNullOrEmpty(text)) return string.Empty;
+
+        var sb = new StringBuilder();
+        var currentIndex = 0;
+
+        var allMatches = new List<(Match Match, TokenRule Rule)>();
+        foreach (var rule in rules)
+        {
+            foreach (Match match in rule.Regex.Matches(text!))
+            {
+                if (match.Success && match.Length > 0)
+                {
+                    allMatches.Add((match, rule));
+                }
+            }
+        }
+
+        // Sort matches:
+        // 1. By start index (ascending).
+        // 2. If start index is same, by Priority (descending - higher priority wins).
+        // 3. If Priority is same, by length (descending - longest match wins).
+        // 4. If all above are same, original rule order can be a tie-breaker (due to stable sort).
+        allMatches.Sort((a, b) =>
+        {
+            var indexComparison = a.Match.Index.CompareTo(b.Match.Index);
+            if (indexComparison != 0) return indexComparison;
+
+            var priorityComparison = b.Rule.Priority.CompareTo(a.Rule.Priority); // Higher priority first
+            if (priorityComparison != 0) return priorityComparison;
+
+            return b.Match.Length.CompareTo(a.Match.Length); // Longest match first
+        });
+
+        var processedMatches = new List<(Match Match, TokenRule Rule)>();
+        var lastProcessedEnd = -1;
+
+        foreach (var currentPotentialMatch in allMatches)
+        {
+            if (currentPotentialMatch.Match.Index >= lastProcessedEnd)
+            {
+                processedMatches.Add(currentPotentialMatch);
+                lastProcessedEnd = currentPotentialMatch.Match.Index + currentPotentialMatch.Match.Length;
+            }
+        }
+        
+        processedMatches.Sort((a, b) => a.Match.Index.CompareTo(b.Match.Index));
+
+
+        foreach (var (match, rule) in processedMatches)
+        {
+            if (match.Index > currentIndex)
+            {
+                sb.Append(HttpUtility.HtmlEncode(text!.Substring(currentIndex, match.Index - currentIndex)));
+            }
+
+            var styleAttribute = !string.IsNullOrEmpty(rule.InlineStyle) ? $" style=\"{HttpUtility.HtmlAttributeEncode(rule.InlineStyle)}\"" : "";
+            var classAttribute = !string.IsNullOrEmpty(rule.CssClass) ? $" class=\"{HttpUtility.HtmlAttributeEncode(rule.CssClass)}\"" : "";
+
+            sb.Append($"<span{classAttribute}{styleAttribute}>{HttpUtility.HtmlEncode(match.Value)}</span>");
+            currentIndex = match.Index + match.Length;
+        }
+
+        if (currentIndex < text.Length)
+        {
+            sb.Append(HttpUtility.HtmlEncode(text[currentIndex..]));
+        }
+
+        return sb.ToString();
+    }
+}
