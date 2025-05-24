@@ -4,8 +4,33 @@
         <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+
+        <!-- NuGet Package Properties -->
+        <PackageId>S97SP.Prism.Blazor</PackageId>
+        <Version>1.0.0</Version>
+        <Authors>Scippo97 Sensible Productions</Authors>
+        <Description>A lightweight, extensible, and Blazor-native component for client-side syntax highlighting. It leverages regular expressions to tokenize code and applies CSS classes or inline styles for theming, bringing Prism.js-like capabilities directly into the .NET Blazor ecosystem without JavaScript interop for the core highlighting logic.</Description>
+        <Copyright>Copyright (c) $(Authors) $([System.DateTime]::UtcNow.Year)</Copyright>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/lorenzodimauro97/Prism.Blazor</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/lorenzodimauro97/Prism.Blazor.git</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>blazor;syntax-highlighting;prism;code;csharp;javascript;html;css;razor;typescript;tsx;jsx;xml;sql</PackageTags>
+        <PackageReleaseNotes>Initial release of Prism.Blazor.</PackageReleaseNotes>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <DebugType>portable</DebugType>
     </PropertyGroup>
 
+    <ItemGroup>
+        <!-- Corrected path for README.md -->
+        <None Include="README.md" Pack="true" PackagePath="\"/>
+    </ItemGroup>
 
     <ItemGroup>
         <SupportedPlatform Include="browser"/>
@@ -16,13 +41,13 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="wwwroot\" />
+        <Folder Include="wwwroot\" />
     </ItemGroup>
 
     <ItemGroup>
-      <Content Update="PresetDefinitions\CodeHighlighter.razor.css">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      </Content>
+        <Content Update="PresetDefinitions\CodeHighlighter.razor.css">
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        </Content>
     </ItemGroup>
 
 </Project>

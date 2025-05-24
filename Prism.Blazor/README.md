@@ -1,7 +1,7 @@
 # Prism.Blazor
 
-[![Build Status](https://img.shields.io/github/actions/workflow/status/YOUR_USERNAME/Prism.Blazor/dotnet.yml?branch=main&style=flat-square)](https://github.com/YOUR_USERNAME/Prism.Blazor/actions)
-[![NuGet Version](https://img.shields.io/nuget/v/YOUR_PACKAGE_NAME.svg?style=flat-square)](https://www.nuget.org/packages/YOUR_PACKAGE_NAME/)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/lorenzodimauro97/Prism.Blazor/dotnet.yml?branch=main&style=flat-square)](https://github.com/lorenzodimauro97/Prism.Blazor/actions)
+[![NuGet Version](https://img.shields.io/nuget/v/S97SP.Prism.Blazor.svg?style=flat-square)](https://www.nuget.org/packages/S97SP.Prism.Blazor/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 
 **Prism.Blazor** is a lightweight, extensible, and Blazor-native component for client-side syntax highlighting. It leverages regular expressions to tokenize code and applies CSS classes or inline styles for theming, bringing Prism.js-like capabilities directly into the .NET Blazor ecosystem without JavaScript interop for the core highlighting logic.
