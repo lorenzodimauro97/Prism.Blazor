@@ -44,10 +44,4 @@
         <Folder Include="wwwroot\" />
     </ItemGroup>
 
-    <ItemGroup>
-        <Content Update="PresetDefinitions\CodeHighlighter.razor.css">
-            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        </Content>
-    </ItemGroup>
-
 </Project>

@@ -1,0 +1,38 @@
+﻿@using System.Text.RegularExpressions
+@using System.Text
+@using System.Web
+@using Prism.Blazor.Parsers
+
+@if (!string.IsNullOrEmpty(MarkdownContent))
+{
+    <div class="markdown-body">@_renderedContent</div>
+}
+@code {
+     private MarkupString _renderedContent;
+     private string? _previousMarkdownContent;
+     private bool _previousUseHardLineBreaks;
+
+     [Parameter] public string? MarkdownContent { get; set; }
+     [Parameter] public bool UseHardLineBreaks { get; set; } = false;
+
+     protected override void OnParametersSet()
+     {
+         if (MarkdownContent != _previousMarkdownContent || UseHardLineBreaks != _previousUseHardLineBreaks)
+         {
+             _previousMarkdownContent = MarkdownContent;
+             _previousUseHardLineBreaks = UseHardLineBreaks;
+             ProcessAndRenderMarkdown();
+         }
+     }
+
+     private void ProcessAndRenderMarkdown()
+     {
+         if (string.IsNullOrEmpty(MarkdownContent))
+         {
+             _renderedContent = new MarkupString(string.Empty);
+             return;
+         }
+         var html = MarkdownParser.ToHtml(MarkdownContent!, UseHardLineBreaks);
+         _renderedContent = new MarkupString(html);
+     }
+ }
