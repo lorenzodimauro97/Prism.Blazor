@@ -67,10 +67,10 @@ public static class MarkdownParser
             var line = lines[i];
             var trimmedLine = line.Trim();
             
-            if (codeBlockPlaceholders.ContainsKey(trimmedLine))
+            if (codeBlockPlaceholders.TryGetValue(trimmedLine, out var placeholder))
             {
                 FinalizeParagraph(); FinalizeList();
-                sb.Append(codeBlockPlaceholders[trimmedLine]).Append('\n');
+                sb.Append(placeholder).Append('\n');
                 continue;
             }
             
@@ -151,9 +151,9 @@ public static class MarkdownParser
         current = LinkRegex.Replace(current, m =>
             $"<a href=\"{HttpUtility.HtmlAttributeEncode(m.Groups[2].Value)}\">{HttpUtility.HtmlEncode(m.Groups[1].Value)}</a>");
         
-        current = BoldRegex.Replace(current, m => $"<strong>{HttpUtility.HtmlEncode(m.Groups[1].Value)}</strong>");
-        current = ItalicRegex.Replace(current, m => $"<em>{HttpUtility.HtmlEncode(m.Groups[1].Value)}</em>");
-        current = StrikethroughRegex.Replace(current, m => $"<del>{HttpUtility.HtmlEncode(m.Groups[1].Value)}</del>");
+        current = BoldRegex.Replace(current, m => $"<strong>{HttpUtility.HtmlEncode(m.Groups[2].Value)}</strong>");
+        current = ItalicRegex.Replace(current, m => $"<em>{HttpUtility.HtmlEncode(m.Groups[2].Value)}</em>");
+        current = StrikethroughRegex.Replace(current, m => $"<del>{HttpUtility.HtmlEncode(m.Groups[2].Value)}</del>");
 
         return current;
     }

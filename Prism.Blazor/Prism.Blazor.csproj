@@ -7,7 +7,7 @@
 
         <!-- NuGet Package Properties -->
         <PackageId>S97SP.Prism.Blazor</PackageId>
-        <Version>1.0.0</Version>
+        <Version>1.0.2</Version>
         <Authors>Scippo97 Sensible Productions</Authors>
         <Description>A lightweight, extensible, and Blazor-native component for client-side syntax highlighting. It leverages regular expressions to tokenize code and applies CSS classes or inline styles for theming, bringing Prism.js-like capabilities directly into the .NET Blazor ecosystem without JavaScript interop for the core highlighting logic.</Description>
         <Copyright>Copyright (c) $(Authors) $([System.DateTime]::UtcNow.Year)</Copyright>
@@ -25,6 +25,7 @@
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <DebugType>portable</DebugType>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <ItemGroup>
