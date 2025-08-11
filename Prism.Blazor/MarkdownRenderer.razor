@@ -5,34 +5,56 @@
 
 @if (!string.IsNullOrEmpty(MarkdownContent))
 {
-    <div class="markdown-body">@_renderedContent</div>
+    <div class="markdown-body" style="@_themeStyle">@_renderedContent</div>
 }
 @code {
-     private MarkupString _renderedContent;
-     private string? _previousMarkdownContent;
-     private bool _previousUseHardLineBreaks;
+    private MarkupString _renderedContent;
+    private string? _previousMarkdownContent;
+    private bool _previousUseHardLineBreaks;
+    private Dictionary<string, string>? _previousTheme;
+    private string _themeStyle = "";
 
-     [Parameter] public string? MarkdownContent { get; set; }
-     [Parameter] public bool UseHardLineBreaks { get; set; }
+    [Parameter] public string? MarkdownContent { get; set; }
+    [Parameter] public bool UseHardLineBreaks { get; set; }
+    [Parameter] public Dictionary<string, string>? CustomTheme { get; set; }
 
-     protected override void OnParametersSet()
-     {
-         if (MarkdownContent != _previousMarkdownContent || UseHardLineBreaks != _previousUseHardLineBreaks)
-         {
-             _previousMarkdownContent = MarkdownContent;
-             _previousUseHardLineBreaks = UseHardLineBreaks;
-             ProcessAndRenderMarkdown();
-         }
-     }
+    protected override void OnParametersSet()
+    {
+        if (MarkdownContent != _previousMarkdownContent || UseHardLineBreaks != _previousUseHardLineBreaks || CustomTheme != _previousTheme)
+        {
+            _previousMarkdownContent = MarkdownContent;
+            _previousUseHardLineBreaks = UseHardLineBreaks;
+            _previousTheme = CustomTheme;
+            
+            BuildThemeStyle();
+            ProcessAndRenderMarkdown();
+        }
+    }
+    
+    private void BuildThemeStyle()
+    {
+        if (CustomTheme is null || !CustomTheme.Any())
+        {
+            _themeStyle = "";
+            return;
+        }
 
-     private void ProcessAndRenderMarkdown()
-     {
-         if (string.IsNullOrEmpty(MarkdownContent))
-         {
-             _renderedContent = new MarkupString(string.Empty);
-             return;
-         }
-         var html = MarkdownParser.ToHtml(MarkdownContent!, UseHardLineBreaks);
-         _renderedContent = new MarkupString(html);
-     }
- }
+        var sb = new StringBuilder();
+        foreach (var (key, value) in CustomTheme)
+        {
+            sb.Append($"--md-{key.ToLowerInvariant()}:{value};");
+        }
+        _themeStyle = sb.ToString();
+    }
+
+    private void ProcessAndRenderMarkdown()
+    {
+        if (string.IsNullOrEmpty(MarkdownContent))
+        {
+            _renderedContent = new MarkupString(string.Empty);
+            return;
+        }
+        var html = MarkdownParser.ToHtml(MarkdownContent!, UseHardLineBreaks);
+        _renderedContent = new MarkupString(html);
+    }
+}

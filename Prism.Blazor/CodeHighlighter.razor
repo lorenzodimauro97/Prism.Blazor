@@ -8,7 +8,7 @@
 }
 else
 {
-    <pre class="code-highlighter-pre"><code
+    <pre class="code-highlighter-pre" style="@_themeStyle"><code
             class="code-highlighter-code language-@(LanguageDefinition?.Name.ToLowerInvariant() ?? "unknown")">@_highlightedContent</code></pre>
 }
 
@@ -17,24 +17,42 @@ else
     private bool _isProcessing = true;
     private string? _previousContent;
     private ILanguageDefinition? _previousLanguageDefinition;
+    private Dictionary<string, string>? _previousTheme;
+    private string _themeStyle = "";
 
     [Parameter] public string? Content { get; set; }
-
     [Parameter] public ILanguageDefinition? LanguageDefinition { get; set; }
-
     [Parameter] public string LoadingMessage { get; set; } = "Processing code...";
-
     [Parameter] public string ErrorMessage { get; set; } = "Error highlighting code.";
-
-
+    [Parameter] public Dictionary<string, string>? CustomTheme { get; set; }
+    
     protected override async Task OnParametersSetAsync()
     {
-        if (Content != _previousContent || LanguageDefinition != _previousLanguageDefinition)
+        if (Content != _previousContent || LanguageDefinition != _previousLanguageDefinition || CustomTheme != _previousTheme)
         {
             _previousContent = Content;
             _previousLanguageDefinition = LanguageDefinition;
+            _previousTheme = CustomTheme;
+            
+            BuildThemeStyle();
             await HighlightAsync();
         }
+    }
+
+    private void BuildThemeStyle()
+    {
+        if (CustomTheme is null || !CustomTheme.Any())
+        {
+            _themeStyle = "";
+            return;
+        }
+
+        var sb = new StringBuilder();
+        foreach (var (key, value) in CustomTheme)
+        {
+            sb.Append($"--ch-{key.ToLowerInvariant()}:{value};");
+        }
+        _themeStyle = sb.ToString();
     }
 
     private async Task HighlightAsync()
@@ -85,21 +103,16 @@ else
                 }
             }
         }
-
-        // Sort matches:
-        // 1. By start index (ascending).
-        // 2. If start index is same, by Priority (descending - higher priority wins).
-        // 3. If Priority is same, by length (descending - longest match wins).
-        // 4. If all above are same, original rule order can be a tie-breaker (due to stable sort).
+        
         allMatches.Sort((a, b) =>
         {
             var indexComparison = a.Match.Index.CompareTo(b.Match.Index);
             if (indexComparison != 0) return indexComparison;
 
-            var priorityComparison = b.Rule.Priority.CompareTo(a.Rule.Priority); // Higher priority first
+            var priorityComparison = b.Rule.Priority.CompareTo(a.Rule.Priority);
             if (priorityComparison != 0) return priorityComparison;
 
-            return b.Match.Length.CompareTo(a.Match.Length); // Longest match first
+            return b.Match.Length.CompareTo(a.Match.Length);
         });
 
         var processedMatches = new List<(Match Match, TokenRule Rule)>();
@@ -124,10 +137,8 @@ else
                 sb.Append(HttpUtility.HtmlEncode(text!.Substring(currentIndex, match.Index - currentIndex)));
             }
 
-            var styleAttribute = !string.IsNullOrEmpty(rule.InlineStyle) ? $" style=\"{HttpUtility.HtmlAttributeEncode(rule.InlineStyle)}\"" : "";
             var classAttribute = !string.IsNullOrEmpty(rule.CssClass) ? $" class=\"{HttpUtility.HtmlAttributeEncode(rule.CssClass)}\"" : "";
-
-            sb.Append($"<span{classAttribute}{styleAttribute}>{HttpUtility.HtmlEncode(match.Value)}</span>");
+            sb.Append($"<span{classAttribute}>{HttpUtility.HtmlEncode(match.Value)}</span>");
             currentIndex = match.Index + match.Length;
         }
 
